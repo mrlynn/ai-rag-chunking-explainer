@@ -81,6 +81,11 @@ How can I assist you today?`
     }]);
   }, []);
 
+  // Fix the first useEffect
+  useEffect(() => {
+    addDebugLog('Component mounted');
+  }, [addDebugLog]);
+
   // Handle new user input
   const handleSend = () => {
     if (inputMessage.trim()) {
@@ -97,50 +102,15 @@ How can I assist you today?`
     }
   };
 
-  // Handle response from parent component
+  // Fix the second useEffect
   useEffect(() => {
-    addDebugLog('useEffect [generatedResponse, pendingQuery]', { 
-      generatedResponse, 
-      pendingQuery,
-      isTyping 
-    });
-
     if (generatedResponse && pendingQuery) {
-      // If we already have a message for this query, update it
-      // This handles streaming updates
-      setMessages(prev => {
-        const lastMessage = prev[prev.length - 1];
-        if (lastMessage && lastMessage.role === 'assistant' && isTyping) {
-          // Update the existing message with the new content
-          const formattedResponse = formatResponse(pendingQuery, generatedResponse);
-          addDebugLog('updating existing message', { 
-            originalResponse: generatedResponse,
-            formattedResponse 
-          });
-          
-          return [
-            ...prev.slice(0, -1),
-            { role: 'assistant', content: formattedResponse }
-          ];
-        } else {
-          // Add a new message
-          const formattedResponse = formatResponse(pendingQuery, generatedResponse);
-          addDebugLog('adding new message', { 
-            originalResponse: generatedResponse,
-            formattedResponse 
-          });
-          
-          return [...prev, { role: 'assistant', content: formattedResponse }];
-        }
-      });
-      
-      // If the response is complete (not streaming), reset typing state
-      if (!isLoading) {
-        setIsTyping(false);
-        setPendingQuery(null);
-      }
+      const formattedResponse = formatResponse(generatedResponse);
+      setMessages(prev => [...prev, { role: 'assistant', content: formattedResponse }]);
+      setPendingQuery('');
+      addDebugLog('Response received and formatted', { response: formattedResponse });
     }
-  }, [generatedResponse, pendingQuery, isLoading, isTyping, addDebugLog]);
+  }, [generatedResponse, pendingQuery, formatResponse, addDebugLog]);
 
   // Format the response with greeting and closing
   const formatResponse = (query, response) => {

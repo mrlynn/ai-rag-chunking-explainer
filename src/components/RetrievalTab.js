@@ -113,7 +113,7 @@ export default function RetrievalTab({ chunks, onSearch, searchResults, query })
             </Typography>
             
             <Typography variant="body2" paragraph>
-              This demo uses MongoDB's $vectorSearch aggregation stage to find semantically similar chunks.
+              This demo uses MongoDB&apos;s $vectorSearch aggregation stage to find semantically similar chunks.
             </Typography>
             
             <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
@@ -157,7 +157,7 @@ export default function RetrievalTab({ chunks, onSearch, searchResults, query })
                 fontSize: '0.75rem'
               }}
             >
-{`db.collection('embeddings').aggregate([
+{`db.collection(&apos;embeddings&apos;).aggregate([
   {
     $vectorSearch: {
       index: "default",

@@ -88,7 +88,7 @@ export default function EmbeddingTab({ chunks, embeddings }) {
       </Typography>
       
       <Typography variant="body1" paragraph>
-        Each chunk is converted into a high-dimensional vector using OpenAI's embedding model.
+        Each chunk is converted into a high-dimensional vector using OpenAI&apos;s embedding model.
         The visualization below uses dimensionality reduction (UMAP) to show how chunks are organized in 2D space.
         Chunks with similar content appear closer together.
       </Typography>
@@ -124,7 +124,7 @@ export default function EmbeddingTab({ chunks, embeddings }) {
             </Typography>
             
             <Typography variant="body2" paragraph>
-              In this demo, each chunk is embedded using OpenAI's text-embedding-3-small model, 
+              In this demo, each chunk is embedded using OpenAI&apos;s text-embedding-3-small model, 
               which creates a 1536-dimensional vector for each text chunk.
             </Typography>
             

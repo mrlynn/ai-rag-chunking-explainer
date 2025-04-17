@@ -399,7 +399,7 @@ const RAGLifecycleDemo = () => {
   // Effect to process chunks when needed
   useEffect(() => {
     processText();
-  }, [inputText, delimiter, chunkSize, overlap, method]);
+  }, [inputText, delimiter, chunkSize, overlap, method, processText]);
   
   // Process the text into chunks based on selected method
   const processText = () => {
@@ -1633,7 +1633,7 @@ const RAGLifecycleDemo = () => {
                 </div>
                 <div>
                   <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Response Generation</div>
-                  <div>The LLM (e.g., GPT-4o) generates a response based on the retrieved context, answering the user's question with accurate, up-to-date information.</div>
+                  <div>The LLM (e.g., GPT-4&apos;o) generates a response based on the retrieved context, answering the user&apos;s question with accurate, up-to-date information.</div>
                 </div>
               </div>
             </div>

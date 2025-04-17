@@ -38,19 +38,17 @@ To create a vector search index in MongoDB Atlas:
 ## Example Vector Search Query
 The following MongoDB aggregation pipeline performs a vector search:
 
-```javascript
 db.collection.aggregate([
   {
     $vectorSearch: {
       index: "vector_index",
       path: "embedding",
-      queryVector: [0.1, 0.2, ...],
+      queryVector: [0.1, 0.2, 0.3],
       numCandidates: 100,
       limit: 10
     }
   }
 ])
-```
 
 ## Chunking Strategies for Vector Search
 The effectiveness of vector search often depends on how documents are chunked:
@@ -98,14 +96,19 @@ export async function GET() {
         console.log('Vector search index needs to be created via MongoDB Atlas UI');
       }
     } catch (error) {
-      console.warn('Error creating indexes:', error);
+      console.error('Error setting up indexes:', error);
     }
     
-    return NextResponse.json({ text: SAMPLE_TEXT });
+    // Return success response
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Setup completed successfully',
+      sampleText: SAMPLE_TEXT
+    });
   } catch (error) {
-    console.error('Setup error:', error);
+    console.error('Error in setup:', error);
     return NextResponse.json(
-      { error: 'Setup failed', text: SAMPLE_TEXT }, 
+      { error: 'Failed to complete setup' }, 
       { status: 500 }
     );
   }
