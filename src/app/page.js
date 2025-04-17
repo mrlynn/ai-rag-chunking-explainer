@@ -17,6 +17,7 @@ export default function Home() {
   const [retrievedChunks, setRetrievedChunks] = useState([]);
   const [generatedResponse, setGeneratedResponse] = useState('');
   const [query, setQuery] = useState('');
+  const [conversationHistory, setConversationHistory] = useState([]);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -141,7 +142,8 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           query: userQuery, 
-          context: searchData.results ? searchData.results.map(chunk => chunk.text).join('\n\n') : ''
+          context: searchData.results ? searchData.results.map(chunk => chunk.text).join('\n\n') : '',
+          conversationHistory: conversationHistory
         }),
       });
       
@@ -149,6 +151,13 @@ export default function Home() {
       
       // Set the response after both search and chat are complete
       setGeneratedResponse(chatData.response);
+      
+      // Update conversation history with the new exchange
+      setConversationHistory(prev => [
+        ...prev,
+        { role: 'user', content: userQuery },
+        { role: 'assistant', content: chatData.response }
+      ]);
     } catch (error) {
       console.error('Error in chat generation:', error);
       setGeneratedResponse('I apologize, but I encountered an error while processing your request. Please try again.');
@@ -221,6 +230,7 @@ export default function Home() {
               onGenerate={handleGenerate}
               generatedResponse={generatedResponse}
               isLoading={isLoading}
+              conversationHistory={conversationHistory}
             />
           )}
         </Box>

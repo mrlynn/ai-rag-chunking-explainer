@@ -4,7 +4,7 @@ import openai from '@/lib/openai';
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { query, context } = data;
+    const { query, context, conversationHistory = [] } = data;
     
     if (!query) {
       return NextResponse.json(
@@ -20,13 +20,17 @@ If the context doesn't contain relevant information, say you don't know but don'
 CONTEXT:
 ${context || 'No context provided'}`;
     
+    // Prepare messages array with system prompt, conversation history, and current query
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...conversationHistory,
+      { role: "user", content: query }
+    ];
+    
     // Generate a response using OpenAI
     const completion = await openai.chat.completions.create({
       model: "gpt-4-turbo",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: query }
-      ],
+      messages: messages,
       temperature: 0.5,
       max_tokens: 500
     });

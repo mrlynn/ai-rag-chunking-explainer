@@ -23,7 +23,14 @@ const mongoColors = {
   textMedium: "#889397"
 };
 
-export default function GenerationTab({ retrievedChunks, query, onGenerate, generatedResponse, isLoading }) {
+export default function GenerationTab({ 
+  retrievedChunks, 
+  query, 
+  onGenerate, 
+  generatedResponse, 
+  isLoading,
+  conversationHistory = []
+}) {
   const [messages, setMessages] = useState([
     { 
       role: 'assistant', 
@@ -44,6 +51,15 @@ How can I assist you today?`
   const [pendingQuery, setPendingQuery] = useState(null);
   const [debugLogs, setDebugLogs] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+  const [localConversationHistory, setLocalConversationHistory] = useState(conversationHistory);
+
+  // Update local conversation history when prop changes
+  useEffect(() => {
+    setLocalConversationHistory(conversationHistory);
+    addDebugLog('conversationHistory updated', { 
+      historyLength: conversationHistory.length 
+    });
+  }, [conversationHistory]);
 
   // Debug logging function
   const addDebugLog = useCallback((action, data) => {
@@ -141,6 +157,26 @@ ${closingLine}`;
     setActiveTab(newValue);
   };
 
+  const clearConversation = () => {
+    setMessages([
+      { 
+        role: 'assistant', 
+        content: `👋 Hello! I'm your MongoDB Corporate Policy Assistant.
+
+I'm here to help you understand our company policies and procedures. Feel free to ask me about:
+• Time off and leave policies
+• Expense reimbursements
+• Remote work guidelines
+• Professional development
+• Health and wellness benefits
+
+How can I assist you today?`
+      }
+    ]);
+    setLocalConversationHistory([]);
+    addDebugLog('clearConversation', { message: 'Conversation history cleared' });
+  };
+
   return (
     <Box sx={{ 
       height: 'calc(100vh - 100px)',
@@ -208,12 +244,33 @@ ${closingLine}`;
             p: 2.5,
             borderBottom: `1px solid ${mongoColors.mint}`,
             backgroundColor: mongoColors.darkGreen,
-            color: mongoColors.white
+            color: mongoColors.white,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
           }}>
-            <Typography variant="h6" sx={{ mb: 0.5 }}>MongoDB Policy Assistant</Typography>
-            <Typography variant="body2" sx={{ color: mongoColors.textMedium }}>
-              Your Corporate Policy Guide
-            </Typography>
+            <Box>
+              <Typography variant="h6" sx={{ mb: 0.5 }}>MongoDB Policy Assistant</Typography>
+              <Typography variant="body2" sx={{ color: mongoColors.textMedium }}>
+                Your Corporate Policy Guide
+              </Typography>
+            </Box>
+            <IconButton 
+              onClick={clearConversation}
+              sx={{ 
+                color: mongoColors.white,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+              title="Clear conversation"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              </svg>
+            </IconButton>
           </Box>
 
           {/* Messages container */}
@@ -529,9 +586,49 @@ ${closingLine}`;
                       isTyping,
                       hasGeneratedResponse: !!generatedResponse,
                       messageCount: messages.length,
-                      retrievedChunksCount: retrievedChunks.length
+                      retrievedChunksCount: retrievedChunks.length,
+                      conversationHistoryLength: localConversationHistory.length
                     }, null, 2)}
                   </pre>
+                </Box>
+
+                <Typography variant="subtitle2" gutterBottom sx={{ color: mongoColors.darkGreen }}>
+                  Conversation History:
+                </Typography>
+                <Box sx={{ 
+                  backgroundColor: mongoColors.lightGreen,
+                  p: 2.5,
+                  borderRadius: 1,
+                  maxHeight: '200px',
+                  overflowY: 'auto'
+                }}>
+                  {localConversationHistory.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {localConversationHistory.map((msg, index) => (
+                        <Box 
+                          key={index}
+                          sx={{ 
+                            p: 1.5,
+                            borderRadius: 1,
+                            backgroundColor: msg.role === 'user' ? mongoColors.mint : mongoColors.white,
+                            fontSize: '0.75rem',
+                            borderLeft: `3px solid ${msg.role === 'user' ? mongoColors.green : mongoColors.blueGreen}`
+                          }}
+                        >
+                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: mongoColors.blueGreen }}>
+                            {msg.role === 'user' ? 'User' : 'Assistant'}:
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+                            {msg.content}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" sx={{ color: mongoColors.textMedium }}>
+                      No conversation history yet.
+                    </Typography>
+                  )}
                 </Box>
 
                 <Typography variant="subtitle2" gutterBottom sx={{ color: mongoColors.darkGreen }}>
