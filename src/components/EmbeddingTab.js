@@ -246,16 +246,6 @@ export default function EmbeddingTab({ chunks = [], embeddings = [] }) {
         borderBottom: '1px solid',
         borderColor: 'divider'
       }}>
-        <Box 
-          component="img"
-          src="/logo.png"
-          alt="MongoDB Logo"
-          sx={{ 
-            height: 40,
-            mb: 2,
-            objectFit: 'contain'
-          }}
-        />
         <Typography variant="h4" gutterBottom>
           Vector Embeddings
         </Typography>
