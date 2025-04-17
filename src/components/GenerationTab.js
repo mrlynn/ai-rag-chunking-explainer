@@ -9,6 +9,8 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpDialog from './HelpDialog';
 
 // MongoDB Brand Colors
 const mongoColors = {
@@ -61,6 +63,7 @@ How can I assist you today?`
   const [debugLogs, setDebugLogs] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [localConversationHistory, setLocalConversationHistory] = useState(conversationHistory);
+  const [helpOpen, setHelpOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Debug logging function
@@ -298,22 +301,36 @@ How can I assist you today?`
                 Your Corporate Policy Guide
               </Typography>
             </Box>
-            <IconButton 
-              onClick={clearConversation}
-              sx={{ 
-                color: mongoColors.white,
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
-              title="Clear conversation"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 6h18"></path>
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-              </svg>
-            </IconButton>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton 
+                onClick={() => setHelpOpen(true)}
+                sx={{ 
+                  color: mongoColors.white,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+                title="Help & Documentation"
+              >
+                <HelpOutlineIcon />
+              </IconButton>
+              <IconButton 
+                onClick={clearConversation}
+                sx={{ 
+                  color: mongoColors.white,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+                title="Clear conversation"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+              </IconButton>
+            </Box>
           </Box>
 
           {/* Messages container */}
@@ -713,6 +730,7 @@ How can I assist you today?`
           </Box>
         </Paper>
       </Box>
+      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
     </Box>
   );
 }

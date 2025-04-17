@@ -71,7 +71,7 @@ export default function RetrievalTab({ chunks, onSearch, searchResults, query })
           </Paper>
         </Grid>
         
-        <Grid item xs={12} md={7}>
+        <Grid item xs={14} md={9}>
           <Typography variant="subtitle2" gutterBottom>
             Search Results
           </Typography>
@@ -106,7 +106,7 @@ export default function RetrievalTab({ chunks, onSearch, searchResults, query })
           )}
         </Grid>
         
-        <Grid item xs={12} md={5}>
+        <Grid item xs={16} md={3}>
           <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
               MongoDB Vector Search
