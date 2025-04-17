@@ -134,7 +134,7 @@ export default function Home() {
       const searchData = await searchResponse.json();
       setRetrievedChunks(searchData.results || []);
       
-      // Then, generate the chat response
+      // Then, generate the chat response with streaming
       const chatResponse = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -143,21 +143,66 @@ export default function Home() {
         body: JSON.stringify({ 
           query: userQuery, 
           context: searchData.results ? searchData.results.map(chunk => chunk.text).join('\n\n') : '',
-          conversationHistory: conversationHistory
+          conversationHistory: conversationHistory,
+          stream: true
         }),
       });
       
-      const chatData = await chatResponse.json();
-      
-      // Set the response after both search and chat are complete
-      setGeneratedResponse(chatData.response);
-      
-      // Update conversation history with the new exchange
-      setConversationHistory(prev => [
-        ...prev,
-        { role: 'user', content: userQuery },
-        { role: 'assistant', content: chatData.response }
-      ]);
+      // Check if the response is a stream
+      if (chatResponse.headers.get('Content-Type')?.includes('text/event-stream')) {
+        // Handle streaming response
+        const reader = chatResponse.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          // Decode the chunk and process it
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') {
+                // Stream is complete
+                break;
+              }
+              
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.content) {
+                  accumulatedResponse += parsed.content;
+                  // Update the response in real-time
+                  setGeneratedResponse(accumulatedResponse);
+                }
+              } catch (e) {
+                console.error('Error parsing streaming data:', e);
+              }
+            }
+          }
+        }
+        
+        // Update conversation history with the complete response
+        setConversationHistory(prev => [
+          ...prev,
+          { role: 'user', content: userQuery },
+          { role: 'assistant', content: accumulatedResponse }
+        ]);
+      } else {
+        // Handle non-streaming response (fallback)
+        const chatData = await chatResponse.json();
+        setGeneratedResponse(chatData.response);
+        
+        // Update conversation history
+        setConversationHistory(prev => [
+          ...prev,
+          { role: 'user', content: userQuery },
+          { role: 'assistant', content: chatData.response }
+        ]);
+      }
     } catch (error) {
       console.error('Error in chat generation:', error);
       setGeneratedResponse('I apologize, but I encountered an error while processing your request. Please try again.');

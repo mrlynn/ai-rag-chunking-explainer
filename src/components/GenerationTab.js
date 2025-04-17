@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Typography, Paper, Grid, IconButton, Avatar, Tabs, Tab, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
@@ -22,6 +22,15 @@ const mongoColors = {
   textLight: "#FFFFFF",
   textMedium: "#889397"
 };
+
+// CSS for animations
+const pulseAnimation = `
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+`;
 
 export default function GenerationTab({ 
   retrievedChunks, 
@@ -52,6 +61,7 @@ How can I assist you today?`
   const [debugLogs, setDebugLogs] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [localConversationHistory, setLocalConversationHistory] = useState(conversationHistory);
+  const messagesEndRef = useRef(null);
 
   // Update local conversation history when prop changes
   useEffect(() => {
@@ -96,21 +106,41 @@ How can I assist you today?`
     });
 
     if (generatedResponse && pendingQuery) {
-      const formattedResponse = formatResponse(pendingQuery, generatedResponse);
-      addDebugLog('formatting response', { 
-        originalResponse: generatedResponse,
-        formattedResponse 
-      });
-
+      // If we already have a message for this query, update it
+      // This handles streaming updates
       setMessages(prev => {
-        addDebugLog('setMessages (assistant)', { newMessage: formattedResponse });
-        return [...prev, { role: 'assistant', content: formattedResponse }];
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage && lastMessage.role === 'assistant' && isTyping) {
+          // Update the existing message with the new content
+          const formattedResponse = formatResponse(pendingQuery, generatedResponse);
+          addDebugLog('updating existing message', { 
+            originalResponse: generatedResponse,
+            formattedResponse 
+          });
+          
+          return [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: formattedResponse }
+          ];
+        } else {
+          // Add a new message
+          const formattedResponse = formatResponse(pendingQuery, generatedResponse);
+          addDebugLog('adding new message', { 
+            originalResponse: generatedResponse,
+            formattedResponse 
+          });
+          
+          return [...prev, { role: 'assistant', content: formattedResponse }];
+        }
       });
       
-      setIsTyping(false);
-      setPendingQuery(null);
+      // If the response is complete (not streaming), reset typing state
+      if (!isLoading) {
+        setIsTyping(false);
+        setPendingQuery(null);
+      }
     }
-  }, [generatedResponse, pendingQuery, addDebugLog]);
+  }, [generatedResponse, pendingQuery, isLoading, isTyping, addDebugLog]);
 
   // Format the response with greeting and closing
   const formatResponse = (query, response) => {
@@ -176,6 +206,27 @@ How can I assist you today?`
     setLocalConversationHistory([]);
     addDebugLog('clearConversation', { message: 'Conversation history cleared' });
   };
+
+  // Add the animation style to the document
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = pulseAnimation;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Scroll to bottom when messages change or when typing
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   return (
     <Box sx={{ 
@@ -368,11 +419,12 @@ How can I assist you today?`
                       display: 'inline-block',
                       animation: 'pulse 1s infinite'
                     }}/>
-                    Composing response...
+                    {generatedResponse ? 'Completing response...' : 'Composing response...'}
                   </Typography>
                 </Box>
               </Box>
             )}
+            <div ref={messagesEndRef} />
           </Box>
 
           {/* Input area */}

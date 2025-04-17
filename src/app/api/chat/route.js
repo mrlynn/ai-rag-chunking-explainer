@@ -4,7 +4,7 @@ import openai from '@/lib/openai';
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { query, context, conversationHistory = [] } = data;
+    const { query, context, conversationHistory = [], stream = false } = data;
     
     if (!query) {
       return NextResponse.json(
@@ -27,17 +27,61 @@ ${context || 'No context provided'}`;
       { role: "user", content: query }
     ];
     
-    // Generate a response using OpenAI
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages: messages,
-      temperature: 0.5,
-      max_tokens: 500
-    });
-    
-    const response = completion.choices[0].message.content;
-    
-    return NextResponse.json({ response });
+    // If streaming is requested, return a streaming response
+    if (stream) {
+      // Create a new ReadableStream
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            // Generate a streaming response using OpenAI
+            const completion = await openai.chat.completions.create({
+              model: "gpt-4-turbo",
+              messages: messages,
+              temperature: 0.5,
+              max_tokens: 500,
+              stream: true
+            });
+            
+            // Process each chunk from the stream
+            for await (const chunk of completion) {
+              const content = chunk.choices[0]?.delta?.content || '';
+              if (content) {
+                // Send the chunk as a server-sent event
+                controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`));
+              }
+            }
+            
+            // Send the end of the stream
+            controller.enqueue(new TextEncoder().encode(`data: [DONE]\n\n`));
+            controller.close();
+          } catch (error) {
+            console.error('Error in streaming response:', error);
+            controller.error(error);
+          }
+        }
+      });
+      
+      // Return the stream with the appropriate headers
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      });
+    } else {
+      // Non-streaming response (original implementation)
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4-turbo",
+        messages: messages,
+        temperature: 0.5,
+        max_tokens: 500
+      });
+      
+      const response = completion.choices[0].message.content;
+      
+      return NextResponse.json({ response });
+    }
   } catch (error) {
     console.error('Error generating chat response:', error);
     return NextResponse.json(
