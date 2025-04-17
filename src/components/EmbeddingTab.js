@@ -83,7 +83,7 @@ export default function EmbeddingTab({ chunks = [], embeddings = [] }) {
 
   return (
     <Box sx={{ 
-      height: '100%',
+      height: 'calc(100vh - 100px)',
       display: 'flex',
       flexDirection: 'column',
       bgcolor: 'background.paper',
@@ -99,7 +99,7 @@ export default function EmbeddingTab({ chunks = [], embeddings = [] }) {
         </Typography>
         
         <Typography variant="body1">
-          Each chunk is converted into a high-dimensional vector using OpenAI's embedding model.
+          Each chunk is converted into a high-dimensional vector using OpenAI&apos;s embedding model.
           The visualization below uses dimensionality reduction (UMAP) to show how chunks are organized in 2D space.
           Chunks with similar content appear closer together.
         </Typography>
@@ -110,25 +110,15 @@ export default function EmbeddingTab({ chunks = [], embeddings = [] }) {
         overflow: 'auto',
         p: 3
       }}>
-        <Grid container spacing={3} sx={{ height: '100%' }}>
+        <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Paper elevation={2} sx={{ 
-              p: 3, 
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <Typography variant="subtitle1" gutterBottom>
+            <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+              <Typography variant="subtitle2" gutterBottom>
                 Vector Space Visualization
               </Typography>
               
               {embeddings && embeddings.length > 0 ? (
-                <Box sx={{ 
-                  flexGrow: 1,
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center'
-                }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
                   <svg ref={svgRef}></svg>
                 </Box>
               ) : (
@@ -140,61 +130,38 @@ export default function EmbeddingTab({ chunks = [], embeddings = [] }) {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <Paper elevation={2} sx={{ 
-              p: 3,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <Typography variant="subtitle1" gutterBottom>
+            <Paper elevation={2} sx={{ p: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
                 About Vector Embeddings
               </Typography>
               
-              <Box sx={{ 
-                flexGrow: 1,
-                overflow: 'auto',
-                '&::-webkit-scrollbar': {
-                  width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'transparent',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(0,0,0,0.1)',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                  background: 'rgba(0,0,0,0.2)',
-                }
-              }}>
-                <Typography variant="body2" paragraph>
-                  Vector embeddings convert text into numbers that capture semantic meaning.
-                  Similar text results in similar vectors, enabling semantic search capabilities.
+              <Typography variant="body2" paragraph>
+                Vector embeddings convert text into numbers that capture semantic meaning.
+                Similar text results in similar vectors, enabling semantic search capabilities.
+              </Typography>
+              
+              <Typography variant="body2" paragraph>
+                In this demo, each chunk is embedded using OpenAI&apos;s text-embedding-3-small model, 
+                which creates a 1536-dimensional vector for each text chunk.
+              </Typography>
+              
+              <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                Embedding Stats
+              </Typography>
+              
+              <Box component="ul" sx={{ pl: 2 }}>
+                <Typography component="li" variant="body2">
+                  Number of Chunks: {chunks?.length || 0}
                 </Typography>
-                
-                <Typography variant="body2" paragraph>
-                  In this demo, each chunk is embedded using OpenAI's text-embedding-3-small model, 
-                  which creates a 1536-dimensional vector for each text chunk.
+                <Typography component="li" variant="body2">
+                  Number of Vectors: {embeddings?.length || 0}
                 </Typography>
-                
-                <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-                  Embedding Stats
+                <Typography component="li" variant="body2">
+                  Embedding Model: text-embedding-3-small
                 </Typography>
-                
-                <Box component="ul" sx={{ pl: 2 }}>
-                  <Typography component="li" variant="body2">
-                    Number of Chunks: {chunks?.length || 0}
-                  </Typography>
-                  <Typography component="li" variant="body2">
-                    Number of Vectors: {embeddings?.length || 0}
-                  </Typography>
-                  <Typography component="li" variant="body2">
-                    Embedding Model: text-embedding-3-small
-                  </Typography>
-                  <Typography component="li" variant="body2">
-                    Dimensions: 1536 (reduced to 2D for visualization)
-                  </Typography>
-                </Box>
+                <Typography component="li" variant="body2">
+                  Dimensions: 1536 (reduced to 2D for visualization)
+                </Typography>
               </Box>
             </Paper>
           </Grid>

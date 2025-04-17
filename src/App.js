@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // MongoDB Brand Colors
 const mongoColors = {
@@ -396,57 +396,72 @@ const RAGLifecycleDemo = () => {
     }
   }, [docType]);
   
-  // Effect to process chunks when needed
-  useEffect(() => {
-    processText();
-  }, [inputText, delimiter, chunkSize, overlap, method, processText]);
-  
-  // Process the text into chunks based on selected method
-  const processText = () => {
-    let chunks = [];
+  // Process text into chunks
+  const processText = useCallback((text, chunkSize, overlap) => {
+    if (!text) return [];
     
-    switch (method) {
-      case 0: // No chunking
-        chunks = [inputText];
-        break;
-      case 1: // Simple delimiter
-        chunks = chunkByDelimiter(inputText, delimiter);
-        break;
-      case 2: // Fixed token with overlap
-        chunks = chunkByFixedSize(inputText, chunkSize, overlap);
-        break;
-      case 3: // Recursive with overlap
-        chunks = recursiveChunk(inputText, chunkSize, overlap);
-        break;
-      case 4: // Semantic
-        chunks = semanticChunk(inputText);
-        break;
-      default:
-        chunks = [inputText];
+    // Split text into sentences
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    const chunks = [];
+    let currentChunk = '';
+    let lastChunkText = '';
+    
+    sentences.forEach((sentence) => {
+      const trimmedSentence = sentence.trim();
+      
+      // If adding this sentence would exceed chunk size, save current chunk
+      if ((currentChunk + trimmedSentence).length > chunkSize && currentChunk) {
+        chunks.push({
+          text: currentChunk.trim(),
+          metadata: {
+            size: currentChunk.length,
+            sentences: currentChunk.match(/[^.!?]+[.!?]+/g)?.length || 0
+          }
+        });
+        // Keep last N characters based on overlap
+        lastChunkText = currentChunk.slice(-overlap);
+        currentChunk = lastChunkText + ' ' + trimmedSentence;
+      } else {
+        currentChunk += (currentChunk ? ' ' : '') + trimmedSentence;
+      }
+    });
+    
+    // Add the last chunk if there is one
+    if (currentChunk) {
+      chunks.push({
+        text: currentChunk.trim(),
+        metadata: {
+          size: currentChunk.length,
+          sentences: currentChunk.match(/[^.!?]+[.!?]+/g)?.length || 0
+        }
+      });
     }
     
-    setChunkedText(chunks);
-    
-    // Generate "embeddings" for each chunk
-    const newEmbeddings = chunks.map(chunk => generateEmbedding(chunk));
-    
-    // Create vector documents
-    const newVectorDocs = chunks.map((chunk, index) => ({
+    return chunks;
+  }, []);
+
+  // Effect to process text when parameters change
+  useEffect(() => {
+    const newChunks = processText(inputText, chunkSize, overlap);
+    setChunkedText(newChunks);
+    addDebugLog('Text processed into chunks', { 
+      chunkCount: newChunks.length,
+      settings: { chunkSize, overlap }
+    });
+  }, [inputText, chunkSize, overlap, processText, addDebugLog]);
+  
+  // Generate "embeddings" for each chunk
+  useEffect(() => {
+    const newEmbeddings = chunkedText.map(chunk => generateEmbedding(chunk.text));
+    const newVectorDocs = chunkedText.map((chunk, index) => ({
       id: `doc_${index + 1}`,
-      text: chunk,
+      text: chunk.text,
       embedding: newEmbeddings[index],
       color: chunkColors[index % chunkColors.length],
-      metadata: {
-        source: docType,
-        chunkMethod: ['none', 'delimiter', 'fixed', 'recursive', 'semantic'][method],
-        chunkIndex: index,
-        chunkTotal: chunks.length,
-        charCount: chunk.length
-      }
+      metadata: chunk.metadata
     }));
-    
     setVectorDocuments(newVectorDocs);
-  };
+  }, [chunkedText, generateEmbedding, chunkColors]);
   
   // Options for the delimiter method
   const renderChunkingOptions = () => {
@@ -822,7 +837,7 @@ const RAGLifecycleDemo = () => {
                       color: mongoColors.blueGreen,
                       fontWeight: '500'
                     }}>
-                      {chunk.length} chars
+                      {chunk.text.length} chars
                     </span>
                   </div>
                   <div style={{ 
@@ -833,7 +848,7 @@ const RAGLifecycleDemo = () => {
                     maxHeight: method === 0 ? '250px' : 'auto',
                     overflowY: method === 0 ? 'auto' : 'visible'
                   }}>
-                    {chunk}
+                    {chunk.text}
                   </div>
                 </div>
               ))}
