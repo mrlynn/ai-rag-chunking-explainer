@@ -214,9 +214,26 @@ export default function Home() {
   return (
     <Container maxWidth="lg" className="py-8">
       <Paper elevation={3} className="p-6">
-        <Typography variant="h4" component="h1" gutterBottom className="text-center mb-8">
-          MongoDB RAG Lifecycle Demo
-        </Typography>
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 0
+        }}>
+          <Box 
+            component="img"
+            src="/logo.png"
+            alt="MongoDB Logo"
+            sx={{ 
+              height: 300,
+              mb: 0,
+              objectFit: 'contain'
+            }}
+          />
+          <Typography variant="h4" component="h1" gutterBottom className="text-center">
+            MongoDB RAG Lifecycle Demo
+          </Typography>
+        </Box>
         
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
           <Tabs 

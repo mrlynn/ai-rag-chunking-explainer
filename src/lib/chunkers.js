@@ -29,15 +29,39 @@ export function fixedSizeChunking(text, chunkSize = 200, overlap = 50) {
 }
 
 // Delimiter-based chunking (paragraphs, sentences, etc.)
-export function delimiterChunking(text, delimiter = '\n\n') {
-  // Split by delimiter and filter out empty chunks
-  return text.split(delimiter)
+export function delimiterChunking(text, delimiter = '\n\n', chunkSize = 200, overlap = 50) {
+  // First split by delimiter
+  const initialChunks = text.split(delimiter)
     .map(chunk => chunk.trim())
     .filter(chunk => chunk.length > 0);
+  
+  // If chunks are already smaller than chunkSize, return them
+  if (initialChunks.every(chunk => chunk.length <= chunkSize)) {
+    return initialChunks;
+  }
+  
+  // Otherwise, further split large chunks with overlap
+  const finalChunks = [];
+  for (const chunk of initialChunks) {
+    if (chunk.length <= chunkSize) {
+      finalChunks.push(chunk);
+    } else {
+      let i = 0;
+      while (i < chunk.length) {
+        let subChunk = chunk.substring(i, i + chunkSize);
+        i += (chunkSize - overlap);
+        if (subChunk.trim().length > 0) {
+          finalChunks.push(subChunk);
+        }
+      }
+    }
+  }
+  
+  return finalChunks;
 }
 
 // Recursive chunking - divides text in a hierarchical manner
-export function recursiveChunking(text, maxChunkSize = 200) {
+export function recursiveChunking(text, maxChunkSize = 200, overlap = 50) {
   const chunks = [];
   
   function splitRecursively(text) {
@@ -60,20 +84,16 @@ export function recursiveChunking(text, maxChunkSize = 200) {
       return;
     }
     
-    // If still too large, just do a fixed-size chunk
+    // If still too large, split with overlap
     if (text.length > maxChunkSize) {
-      const midpoint = Math.floor(text.length / 2);
-      // Try to split at a space near the midpoint
-      let splitPoint = text.lastIndexOf(' ', midpoint);
-      if (splitPoint === -1 || splitPoint < maxChunkSize * 0.25) {
-        splitPoint = text.indexOf(' ', midpoint);
+      let i = 0;
+      while (i < text.length) {
+        let chunk = text.substring(i, i + maxChunkSize);
+        i += (maxChunkSize - overlap);
+        if (chunk.trim().length > 0) {
+          chunks.push(chunk);
+        }
       }
-      if (splitPoint === -1) {
-        splitPoint = midpoint;  // Just split at midpoint if no spaces
-      }
-      
-      splitRecursively(text.substring(0, splitPoint));
-      splitRecursively(text.substring(splitPoint).trim());
     } else {
       chunks.push(text);
     }

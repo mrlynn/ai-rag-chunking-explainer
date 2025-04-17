@@ -11,7 +11,7 @@ import {
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { text, method } = data;
+    const { text, method, chunkSize = 200, overlap = 50 } = data;
     
     if (!text) {
       return NextResponse.json(
@@ -28,26 +28,31 @@ export async function POST(request) {
         chunks = noChunking(text);
         break;
       case 'fixed':
-        chunks = fixedSizeChunking(text);
+        chunks = fixedSizeChunking(text, chunkSize, overlap);
         break;
       case 'delimiter':
-        chunks = delimiterChunking(text);
+        chunks = delimiterChunking(text, '\n\n', chunkSize, overlap);
         break;
       case 'recursive':
-        chunks = recursiveChunking(text);
+        chunks = recursiveChunking(text, chunkSize, overlap);
         break;
       case 'semantic':
-        chunks = semanticChunking(text);
+        chunks = semanticChunking(text, chunkSize);
         break;
       default:
-        chunks = fixedSizeChunking(text);
+        chunks = fixedSizeChunking(text, chunkSize, overlap);
     }
     
     // Generate IDs for each chunk
     const chunksWithIds = chunks.map((text, index) => ({
       id: `chunk_${index}`,
       text,
-      method
+      method,
+      metadata: {
+        chunkSize,
+        overlap,
+        index
+      }
     }));
     
     // Store in MongoDB if connected

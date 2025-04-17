@@ -14,10 +14,10 @@ import HelpDialog from './HelpDialog';
 
 // MongoDB Brand Colors
 const mongoColors = {
-  green: "#00ED64",
+  green: "#889397",
   darkGreen: "#001E2B",
   white: "#FFFFFF",
-  mint: "#C3F4D7",
+  mint: "#889397",
   lightGreen: "#E3FCF7",
   blueGreen: "#00684A",
   textDark: "#001E2B",
