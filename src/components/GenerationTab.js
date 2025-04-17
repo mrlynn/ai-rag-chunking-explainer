@@ -250,7 +250,7 @@ How can I assist you today?`
             position: 'relative'  // Added for loading overlay positioning
           }}
         >
-          {isLoading && (
+          {/* {isLoading && (
             <Box
               sx={{
                 position: 'absolute',
@@ -280,7 +280,7 @@ How can I assist you today?`
                 </Typography>
               </Box>
             </Box>
-          )}
+          )} */}
 
           {/* Chat header */}
           <Box sx={{ 
