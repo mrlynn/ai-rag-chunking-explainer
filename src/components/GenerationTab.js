@@ -63,14 +63,6 @@ How can I assist you today?`
   const [localConversationHistory, setLocalConversationHistory] = useState(conversationHistory);
   const messagesEndRef = useRef(null);
 
-  // Update local conversation history when prop changes
-  useEffect(() => {
-    setLocalConversationHistory(conversationHistory);
-    addDebugLog('conversationHistory updated', { 
-      historyLength: conversationHistory.length 
-    });
-  }, [conversationHistory]);
-
   // Debug logging function
   const addDebugLog = useCallback((action, data) => {
     const timestamp = new Date().toISOString();
@@ -81,10 +73,84 @@ How can I assist you today?`
     }]);
   }, []);
 
-  // Fix the first useEffect
+  const getGreeting = useCallback(() => {
+    const greetings = [
+      "Thank you for your question.",
+      "I'd be happy to help you with that.",
+      "Let me assist you with that inquiry.",
+      "I appreciate you asking about this.",
+      "Thank you for reaching out about this."
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  }, []);
+
+  const getClosingLine = useCallback(() => {
+    const closings = [
+      "Is there anything else you'd like to know about this topic?",
+      "Please let me know if you need any clarification.",
+      "Don't hesitate to ask if you have any follow-up questions.",
+      "I'm here if you need any additional information.",
+      "Feel free to ask for more details about any part of this policy."
+    ];
+    return closings[Math.floor(Math.random() * closings.length)];
+  }, []);
+
+  // Format the response with greeting and closing
+  const formatResponse = useCallback((response) => {
+    const greeting = getGreeting();
+    const closingLine = getClosingLine();
+
+    return `${greeting}
+
+${response}
+
+${closingLine}`;
+  }, [getGreeting, getClosingLine]);
+
+  // Update local conversation history when prop changes
+  useEffect(() => {
+    setLocalConversationHistory(conversationHistory);
+    addDebugLog('conversationHistory updated', { 
+      historyLength: conversationHistory.length 
+    });
+  }, [conversationHistory, addDebugLog]);
+
+  // Component mounted effect
   useEffect(() => {
     addDebugLog('Component mounted');
   }, [addDebugLog]);
+
+  // Handle response effect
+  useEffect(() => {
+    if (generatedResponse && pendingQuery) {
+      // Update existing assistant message or add new one
+      setMessages(prev => {
+        const lastMessage = prev[prev.length - 1];
+        
+        // If the last message is from the assistant and we're still typing,
+        // update it with the new content
+        if (lastMessage?.role === 'assistant' && isTyping) {
+          return [
+            ...prev.slice(0, -1),
+            { ...lastMessage, content: generatedResponse }
+          ];
+        }
+        
+        // Otherwise add a new message
+        return [...prev, { 
+          role: 'assistant', 
+          content: generatedResponse
+        }];
+      });
+
+      // Only clear pending query and typing state when response is complete
+      if (!isLoading) {
+        setPendingQuery('');
+        setIsTyping(false);
+        addDebugLog('Response complete', { response: generatedResponse });
+      }
+    }
+  }, [generatedResponse, pendingQuery, isTyping, isLoading, addDebugLog]);
 
   // Handle new user input
   const handleSend = () => {
@@ -100,50 +166,6 @@ How can I assist you today?`
       onGenerate(trimmedMessage);
       setInputMessage('');
     }
-  };
-
-  // Fix the second useEffect
-  useEffect(() => {
-    if (generatedResponse && pendingQuery) {
-      const formattedResponse = formatResponse(generatedResponse);
-      setMessages(prev => [...prev, { role: 'assistant', content: formattedResponse }]);
-      setPendingQuery('');
-      addDebugLog('Response received and formatted', { response: formattedResponse });
-    }
-  }, [generatedResponse, pendingQuery, formatResponse, addDebugLog]);
-
-  // Format the response with greeting and closing
-  const formatResponse = (query, response) => {
-    const greeting = getGreeting();
-    const closingLine = getClosingLine();
-
-    return `${greeting}
-
-${response}
-
-${closingLine}`;
-  };
-
-  const getGreeting = () => {
-    const greetings = [
-      "Thank you for your question.",
-      "I'd be happy to help you with that.",
-      "Let me assist you with that inquiry.",
-      "I appreciate you asking about this.",
-      "Thank you for reaching out about this."
-    ];
-    return greetings[Math.floor(Math.random() * greetings.length)];
-  };
-
-  const getClosingLine = () => {
-    const closings = [
-      "Is there anything else you'd like to know about this topic?",
-      "Please let me know if you need any clarification.",
-      "Don't hesitate to ask if you have any follow-up questions.",
-      "I'm here if you need any additional information.",
-      "Feel free to ask for more details about any part of this policy."
-    ];
-    return closings[Math.floor(Math.random() * closings.length)];
   };
 
   const handleKeyPress = (e) => {
