@@ -228,7 +228,7 @@ How can I assist you today?`
       height: 'calc(100vh - 100px)',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: mongoColors.lightGreen
+      bgcolor: '#e3b25e'
     }}>
       {/* Main content area */}
       <Box sx={{ 
@@ -289,7 +289,7 @@ How can I assist you today?`
           <Box sx={{ 
             p: 2.5,
             borderBottom: `1px solid ${mongoColors.mint}`,
-            backgroundColor: mongoColors.darkGreen,
+            backgroundColor: '#402d11',
             color: mongoColors.white,
             display: 'flex',
             justifyContent: 'space-between',
@@ -533,7 +533,7 @@ How can I assist you today?`
             variant="fullWidth"
             sx={{
               borderBottom: `1px solid ${mongoColors.mint}`,
-              bgcolor: mongoColors.darkGreen,
+              bgcolor: '#402d11',
               '& .MuiTab-root': {
                 color: mongoColors.textMedium,
                 '&.Mui-selected': {
