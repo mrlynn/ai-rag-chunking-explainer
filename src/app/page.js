@@ -330,12 +330,14 @@ export default function Home() {
             }}
           >
             <Typography 
-              variant="h2" 
+              variant="h1" 
               component="h1" 
               sx={{ 
-                fontWeight: 'bold',
+                fontSize: '4rem',
+                fontWeight: 700,
                 mb: 2,
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                letterSpacing: '-0.02em',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
               }}
             >
               MongoDB RAG Lifecycle Demo
@@ -345,7 +347,10 @@ export default function Home() {
               sx={{
                 maxWidth: 800,
                 mx: 'auto',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                fontSize: '1.5rem',
+                fontWeight: 400,
+                opacity: 0.9,
+                textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
               }}
             >
               Explore how different chunking strategies affect the full RAG pipeline
@@ -362,6 +367,30 @@ export default function Home() {
             border: `1px solid ${imageColors.accent.brown}`
           }}
         >
+          {/* Dynamic Header Title */}
+          <Box sx={{ 
+            mb: 4,
+            p: 3,
+            borderRadius: 2,
+            border: `1px solid ${imageColors.accent.brown}`,
+            bgcolor: imageColors.background.main
+          }}>
+            <Typography 
+              variant="h4" 
+              component="h2"
+              sx={{ 
+                color: imageColors.text.primary,
+                fontWeight: 500,
+                textAlign: 'center'
+              }}
+            >
+              {tabIndex === 0 && "Document Chunking Strategy"}
+              {tabIndex === 1 && "Vector Embedding Generation"}
+              {tabIndex === 2 && "Semantic Search & Retrieval"}
+              {tabIndex === 3 && "Context-Aware Response Generation"}
+            </Typography>
+          </Box>
+
           {/* Help buttons */}
           <Box sx={{ 
             display: 'flex',
