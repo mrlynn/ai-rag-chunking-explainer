@@ -1,5 +1,25 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Stepper, Step, StepLabel, StepContent } from '@mui/material';
+'use client';
+
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button, 
+  Typography, 
+  Box, 
+  Stepper, 
+  Step, 
+  StepLabel, 
+  StepContent,
+  IconButton
+} from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import DataArrayIcon from '@mui/icons-material/DataArray';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { mongoColors } from '../theme';
 
 const steps = [
@@ -14,7 +34,8 @@ The app supports multiple chunking strategies:
 • Fixed-size chunks: Splits text into equal-sized pieces
 • Sentence-based: Splits on sentence boundaries
 • Paragraph-based: Splits on paragraph breaks
-• Semantic: Uses AI to identify natural content boundaries`
+• Semantic: Uses AI to identify natural content boundaries`,
+    icon: ContentCutIcon
   },
   {
     label: 'Embedding Generation',
@@ -24,7 +45,8 @@ The app supports multiple chunking strategies:
 • Preserves semantic relationships between chunks
 • Enables similarity-based search
 
-The embeddings are stored in MongoDB Atlas with vector search capabilities, allowing for efficient similarity queries.`
+The embeddings are stored in MongoDB Atlas with vector search capabilities, allowing for efficient similarity queries.`,
+    icon: DataArrayIcon
   },
   {
     label: 'Retrieval',
@@ -34,7 +56,8 @@ The embeddings are stored in MongoDB Atlas with vector search capabilities, allo
 3. Retrieves the most relevant chunks
 4. Ranks them by relevance score
 
-This ensures the AI has the most relevant context to answer your question accurately.`
+This ensures the AI has the most relevant context to answer your question accurately.`,
+    icon: ManageSearchIcon
   },
   {
     label: 'Generation',
@@ -44,7 +67,8 @@ This ensures the AI has the most relevant context to answer your question accura
 • Responses are streamed in real-time
 • The system maintains conversation history
 
-The result is an AI assistant that can provide accurate, context-aware answers from your document collection.`
+The result is an AI assistant that can provide accurate, context-aware answers from your document collection.`,
+    icon: SmartToyIcon
   }
 ];
 
@@ -52,76 +76,118 @@ export default function HelpDialog({ open, onClose }) {
   return (
     <Dialog 
       open={open} 
-      onClose={onClose}
       maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: mongoColors.white,
-          borderRadius: 2
+          bgcolor: mongoColors.background.paper,
+          backgroundImage: 'none'
         }
       }}
     >
       <DialogTitle sx={{ 
-        bgcolor: mongoColors.darkGreen,
-        color: mongoColors.white,
+        bgcolor: mongoColors.green,
+        color: mongoColors.text.primary,
         display: 'flex',
-        alignItems: 'center',
-        gap: 1
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}>
-        <HelpOutlineIcon />
-        RAG Lifecycle Documentation
+        <Typography variant="h6">RAG Pipeline Documentation</Typography>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{ color: mongoColors.text.primary }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ mt: 2 }}>
-        <Typography variant="body1" paragraph>
+
+      <DialogContent sx={{ p: 4 }}>
+        <Typography 
+          variant="body1" 
+          paragraph
+          sx={{ 
+            color: mongoColors.text.secondary,
+            mb: 4
+          }}
+        >
           This application demonstrates the complete RAG (Retrieval-Augmented Generation) lifecycle, from document processing to AI-powered responses. Below is a detailed explanation of each step in the process.
         </Typography>
         
         <Box sx={{ 
-          p: 2, 
-          mb: 3, 
-          bgcolor: mongoColors.lightGreen, 
-          borderRadius: 1,
-          borderLeft: `4px solid ${mongoColors.blueGreen}`
+          p: 3, 
+          mb: 4, 
+          bgcolor: mongoColors.background.dark,
+          borderRadius: 2,
+          border: `1px solid ${mongoColors.ui.border}`
         }}>
           <Typography variant="subtitle1" sx={{ 
-            color: mongoColors.blueGreen,
+            color: mongoColors.green,
             fontWeight: 600,
             mb: 1
           }}>
             Important Disclaimer
           </Typography>
-          <Typography variant="body2" sx={{ color: mongoColors.textDark }}>
+          <Typography variant="body2" sx={{ color: mongoColors.text.secondary }}>
             This application is for demonstration purposes only. The policy data used in this application is not actual MongoDB corporate policy data. All responses generated by the AI are based on sample data and should not be considered official MongoDB policy information.
           </Typography>
         </Box>
         
-        <Stepper orientation="vertical">
-          {steps.map((step, index) => (
-            <Step key={step.label} active={true}>
-              <StepLabel>
-                <Typography variant="h6" sx={{ color: mongoColors.darkGreen }}>
-                  {step.label}
-                </Typography>
-              </StepLabel>
-              <StepContent>
-                <Typography variant="body1" sx={{ 
-                  color: mongoColors.textDark,
-                  whiteSpace: 'pre-line',
-                  mb: 2
-                }}>
-                  {step.description}
-                </Typography>
-              </StepContent>
-            </Step>
-          ))}
+        <Stepper orientation="vertical" sx={{ mb: 4 }}>
+          {steps.map((step, index) => {
+            const StepIcon = step.icon;
+            return (
+              <Step key={step.label} active={true}>
+                <StepLabel
+                  StepIconComponent={() => (
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        bgcolor: mongoColors.green,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: mongoColors.darkGreen
+                      }}
+                    >
+                      <StepIcon />
+                    </Box>
+                  )}
+                >
+                  <Typography variant="h6" sx={{ color: mongoColors.text.primary }}>
+                    {step.label}
+                  </Typography>
+                </StepLabel>
+                <StepContent>
+                  <Typography variant="body1" sx={{ 
+                    color: mongoColors.text.secondary,
+                    whiteSpace: 'pre-line',
+                    mb: 2,
+                    pl: 2
+                  }}>
+                    {step.description}
+                  </Typography>
+                </StepContent>
+              </Step>
+            )
+          })}
         </Stepper>
 
-        <Box sx={{ mt: 4, p: 2, bgcolor: mongoColors.lightGreen, borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom sx={{ color: mongoColors.darkGreen }}>
+        <Box sx={{ 
+          p: 3, 
+          bgcolor: mongoColors.background.dark,
+          borderRadius: 2,
+          border: `1px solid ${mongoColors.ui.border}`
+        }}>
+          <Typography variant="h6" gutterBottom sx={{ color: mongoColors.text.primary }}>
             Best Practices
           </Typography>
-          <Typography variant="body1" sx={{ color: mongoColors.textDark }}>
+          <Typography variant="body1" sx={{ 
+            color: mongoColors.text.secondary,
+            whiteSpace: 'pre-line'
+          }}>
             • Keep chunks between 100-500 tokens for optimal performance
             • Use semantic chunking for complex documents
             • Ensure chunks maintain context and coherence
@@ -130,15 +196,16 @@ export default function HelpDialog({ open, onClose }) {
           </Typography>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ p: 2, bgcolor: mongoColors.lightGreen }}>
-        <Button 
-          onClick={onClose}
+
+      <DialogActions sx={{ p: 3, bgcolor: mongoColors.background.paper }}>
+        <Button
           variant="contained"
-          sx={{ 
+          onClick={onClose}
+          sx={{
             bgcolor: mongoColors.green,
             color: mongoColors.darkGreen,
             '&:hover': {
-              bgcolor: mongoColors.mint
+              bgcolor: mongoColors.forestGreen
             }
           }}
         >

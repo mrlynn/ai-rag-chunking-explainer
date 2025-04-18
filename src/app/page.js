@@ -1,12 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Tabs, Tab, Box, Typography, Container, Paper, CircularProgress } from '@mui/material';
+import { 
+  Tabs, 
+  Tab, 
+  Box, 
+  Typography, 
+  Container, 
+  Paper, 
+  CircularProgress,
+  IconButton,
+  Tooltip
+} from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import BookIcon from '@mui/icons-material/Book';
 import ChunkingTab from '../components/ChunkingTab';
 import EmbeddingTab from '../components/EmbeddingTab';
 import RetrievalTab from '../components/RetrievalTab';
 import GenerationTab from '../components/GenerationTab';
 import OnboardingWizard from '../components/OnboardingWizard';
+import HelpDialog from '../components/HelpDialog';
 
 // New color palette based on the image
 const imageColors = {
@@ -43,6 +57,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [conversationHistory, setConversationHistory] = useState([]);
   const [showWizard, setShowWizard] = useState(false);
+  const [showDocs, setShowDocs] = useState(false);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -247,6 +262,19 @@ export default function Home() {
     }
   };
 
+  const handleRestartTutorial = () => {
+    setShowWizard(true);
+    localStorage.removeItem('ragWizardCompleted');
+  };
+
+  const handleOpenDocs = () => {
+    setShowDocs(true);
+  };
+
+  const handleCloseDocs = () => {
+    setShowDocs(false);
+  };
+
   return (
     <Box sx={{ 
       bgcolor: imageColors.background.main,
@@ -254,6 +282,77 @@ export default function Home() {
       py: 4
     }}>
       <Container maxWidth="lg">
+        {/* Hero Header Section */}
+        <Box sx={{
+          position: 'relative',
+          height: '400px',
+          width: '100%',
+          mb: 6,
+          borderRadius: 4,
+          overflow: 'hidden',
+          boxShadow: 3
+        }}>
+          {/* Background Image */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: 'url(/header-3.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              }
+            }}
+          />
+          
+          {/* Content Overlay */}
+          <Box
+            sx={{
+              position: 'relative',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: '#fff',
+              textAlign: 'center',
+              p: 4
+            }}
+          >
+            <Typography 
+              variant="h2" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 'bold',
+                mb: 2,
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+              }}
+            >
+              MongoDB RAG Lifecycle Demo
+            </Typography>
+            <Typography 
+              variant="h5"
+              sx={{
+                maxWidth: 800,
+                mx: 'auto',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+              }}
+            >
+              Explore how different chunking strategies affect the full RAG pipeline
+            </Typography>
+          </Box>
+        </Box>
+
         <Paper 
           elevation={3} 
           sx={{ 
@@ -263,34 +362,41 @@ export default function Home() {
             border: `1px solid ${imageColors.accent.brown}`
           }}
         >
+          {/* Help buttons */}
           <Box sx={{ 
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            mb: 0
+            justifyContent: 'flex-end',
+            gap: 1,
+            mb: 4
           }}>
-            <Box 
-              component="img"
-              src="/header-2.png"
-              alt="MongoDB Logo"
-              sx={{ 
-                height: 300,
-                mb: 3,
-                objectFit: 'contain'
-              }}
-            />
-            <Typography 
-              variant="h4" 
-              component="h1" 
-              gutterBottom 
-              sx={{ 
-                color: imageColors.text.primary,
-                textAlign: 'center',
-                fontWeight: 'bold'
-              }}
-            >
-              MongoDB RAG Lifecycle Demo
-            </Typography>
+            <Tooltip title="Restart Tutorial">
+              <IconButton 
+                onClick={handleRestartTutorial}
+                sx={{ 
+                  color: imageColors.primary.main,
+                  '&:hover': {
+                    bgcolor: imageColors.primary.light,
+                    color: imageColors.text.light
+                  }
+                }}
+              >
+                <HelpOutlineIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Documentation">
+              <IconButton 
+                onClick={handleOpenDocs}
+                sx={{ 
+                  color: imageColors.primary.main,
+                  '&:hover': {
+                    bgcolor: imageColors.primary.light,
+                    color: imageColors.text.light
+                  }
+                }}
+              >
+                <MenuBookIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
           
           <Box sx={{ 
@@ -408,6 +514,12 @@ export default function Home() {
       <OnboardingWizard 
         open={showWizard}
         onClose={handleWizardClose}
+        colors={imageColors}
+      />
+
+      <HelpDialog 
+        open={showDocs}
+        onClose={handleCloseDocs}
         colors={imageColors}
       />
     </Box>

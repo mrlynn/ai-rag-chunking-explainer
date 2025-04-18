@@ -8,9 +8,12 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "d3": "^7.9.0",
+    "dotenv": "^16.3.1",
     "mongodb": "^6.3.0",
+    "natural": "^8.0.1",
     "next": "^14.0.4",
     "openai": "^4.24.1",
+    "pdf-parse": "^1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^10.1.0",
@@ -22,7 +25,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-rag": "node scripts/setupRagPipeline.js",
+    "extract-pdf": "node scripts/extractPdfText.js",
+    "chunk-docs": "node scripts/chunkDocuments.js",
+    "generate-embeddings": "node scripts/generateEmbeddings.js",
+    "test-rag": "node scripts/runRagPipeline.js",
+    "setup-chatbot": "node scripts/chatbot/setupRagPipeline.js",
+    "extract-chatbot-pdf": "node scripts/chatbot/extractPdfText.js",
+    "chunk-chatbot-docs": "node scripts/chatbot/chunkDocuments.js",
+    "generate-chatbot-embeddings": "node scripts/chatbot/generateEmbeddings.js",
+    "test-chatbot-rag": "node scripts/chatbot/runRagPipeline.js"
   },
   "eslintConfig": {
     "extends": "next/core-web-vitals"

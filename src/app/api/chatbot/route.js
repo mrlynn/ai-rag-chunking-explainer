@@ -139,7 +139,7 @@ async function generateResponse(query, chunks) {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that answers questions about MongoDB and RAG applications based on the provided context. If the answer cannot be found in the context, say so politely and suggest where the user might find more information."
+          content: `You are a helpful assistant that answers questions about MongoDB and RAG applications based on the provided context. If the answer cannot be found in the context, say so politely and suggest where the user might find more information. You are operating within a floating chatbot component on a MongoDB RAG application demonstration.`
         },
         {
           role: "user",

@@ -1,5 +1,7 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
+import Chatbot from '../components/Chatbot'
+import { mongoColors } from '../theme'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,6 +16,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <div className="min-h-screen bg-gray-100">
           {children}
+          <Chatbot colors={mongoColors} />
         </div>
       </body>
     </html>

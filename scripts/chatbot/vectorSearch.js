@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
-import OpenAI from 'openai';
+const { MongoClient } = require('mongodb');
+const OpenAI = require('openai');
+require('dotenv').config({ path: '.env.local' });
 
 // MongoDB connection string
 const uri = process.env.MONGODB_URI;
@@ -158,81 +158,48 @@ async function generateResponse(query, chunks) {
 }
 
 /**
- * Process a query through the RAG pipeline
- * @param {string} query - The user query
- * @param {Object} db - MongoDB database instance
- * @returns {Promise<Object>} - The response and metadata
+ * Main function to test vector search
  */
-async function processQuery(query, db) {
+async function main() {
   try {
+    await client.connect();
+    console.log('Connected to MongoDB');
+    
+    const db = client.db(process.env.MONGODB_DB || 'ragdemo');
+    
+    // Test query
+    const query = "What is RAG and how does it work?";
+    console.log(`Query: ${query}`);
+    
     // Generate embedding for the query
     const embedding = await generateEmbedding(query);
+    console.log('Generated embedding for floating chatbot');
     
     // Perform vector search
     const relevantChunks = await vectorSearch(embedding, db);
+    console.log(`Found ${relevantChunks.length} relevant chunks for floating chatbot`);
     
     // Get document information for each chunk
-    const chunksWithDocs = await Promise.all(
-      relevantChunks.map(async (chunk) => {
-        const document = await getDocumentInfo(chunk.chunkId, db);
-        return {
-          ...chunk,
-          documentName: document ? document.name : 'Unknown'
-        };
-      })
-    );
+    for (const chunk of relevantChunks) {
+      const document = await getDocumentInfo(chunk.chunkId, db);
+      console.log(`\nChunk from document: ${document ? document.name : 'Unknown'}`);
+      console.log(`Score: ${chunk.score}`);
+      console.log(`Content: ${chunk.text.substring(0, 200)}...`);
+    }
     
     // Generate response
     const response = await generateResponse(query, relevantChunks);
+    console.log('\nGenerated Response from floating chatbot:');
+    console.log(response);
     
-    return {
-      query,
-      response,
-      chunks: chunksWithDocs
-    };
+    console.log('Vector search test completed for floating chatbot');
   } catch (error) {
-    console.error('Error processing query:', error);
-    throw error;
+    console.error('Error:', error);
+  } finally {
+    await client.close();
+    console.log('MongoDB connection closed');
   }
 }
 
-export async function POST(request) {
-  try {
-    // Parse request body
-    const { query } = await request.json();
-    
-    if (!query) {
-      return NextResponse.json(
-        { error: 'Query is required' },
-        { status: 400 }
-      );
-    }
-    
-    // Connect to MongoDB
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB || 'ragdemo');
-    
-    // Process the query
-    const result = await processQuery(query, db);
-    
-    // Close MongoDB connection
-    await client.close();
-    
-    // Return the result
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error processing request:', error);
-    
-    // Close MongoDB connection if it's open
-    try {
-      await client.close();
-    } catch (closeError) {
-      console.error('Error closing MongoDB connection:', closeError);
-    }
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+// Run the script
+main().catch(console.error);
