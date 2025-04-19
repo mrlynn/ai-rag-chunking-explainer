@@ -141,8 +141,8 @@ export default function Chatbot() {
     setIsLoading(true);
     
     try {
-      // Call the API to get a response
-      const response = await fetch('/api/chat', {
+      // Call the chatbot API to get a response
+      const response = await fetch('/api/chatbot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
