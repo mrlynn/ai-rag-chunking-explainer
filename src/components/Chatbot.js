@@ -48,7 +48,7 @@ const Message = ({ message, isUser }) => {
           sx={{
             width: 32,
             height: 32,
-            bgcolor: '#e2cf9d',
+            bgcolor: mongoColors.accent.mist,
             mt: 1
           }}
         />
@@ -58,10 +58,13 @@ const Message = ({ message, isUser }) => {
         sx={{
           p: 2,
           maxWidth: '80%',
-          bgcolor: '#f4e2bb',
-          color: isUser ? mongoColors.darkGreen : mongoColors.darkGreen,
+          bgcolor: isUser ? mongoColors.accent.mist : mongoColors.background.light,
+          color: mongoColors.darkGreen,
           borderRadius: 2,
-          border: isUser ? 'none' : `1px solid ${mongoColors.ui.border}`
+          border: `1px solid ${mongoColors.ui.border}`,
+          '&:hover': {
+            borderColor: mongoColors.green
+          }
         }}
       >
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
@@ -69,23 +72,50 @@ const Message = ({ message, isUser }) => {
         </Typography>
         {message.sources && message.sources.length > 0 && (
           <Box sx={{ mt: 1 }}>
-            <Typography variant="caption" sx={{ color: mongoColors.darkGreen }}>
+            <Typography variant="caption" sx={{ color: mongoColors.text.secondary }}>
               Sources:
             </Typography>
             <List dense sx={{ p: 0, m: 0 }}>
               {message.sources.map((source, index) => (
                 <ListItem key={index} sx={{ p: 0, pl: 1 }}>
-                  <ListItemText 
-                    primary={source.documentName}
-                    secondary={source.score ? `Score: ${source.score.toFixed(4)}` : ''}
-                    primaryTypographyProps={{ variant: 'caption' }}
-                    secondaryTypographyProps={{ variant: 'caption' }}
-                    sx={{ 
-                      color: mongoColors.darkGreen,
-                      '& .MuiListItemText-primary': { fontSize: '0.7rem' },
-                      '& .MuiListItemText-secondary': { fontSize: '0.65rem' }
-                    }}
-                  />
+                  {source.documentUrl ? (
+                    <ListItemText 
+                      primary={
+                        <a 
+                          href={source.documentUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ 
+                            color: mongoColors.green,
+                            textDecoration: 'underline',
+                            fontSize: '0.7rem'
+                          }}
+                        >
+                          {source.documentName}
+                        </a>
+                      }
+                      secondary={source.score ? `Score: ${source.score.toFixed(4)}` : ''}
+                      primaryTypographyProps={{ variant: 'caption' }}
+                      secondaryTypographyProps={{ variant: 'caption' }}
+                      sx={{ 
+                        color: mongoColors.text.secondary,
+                        '& .MuiListItemText-primary': { fontSize: '0.7rem' },
+                        '& .MuiListItemText-secondary': { fontSize: '0.65rem' }
+                      }}
+                    />
+                  ) : (
+                    <ListItemText 
+                      primary={source.documentName}
+                      secondary={source.score ? `Score: ${source.score.toFixed(4)}` : ''}
+                      primaryTypographyProps={{ variant: 'caption' }}
+                      secondaryTypographyProps={{ variant: 'caption' }}
+                      sx={{ 
+                        color: mongoColors.text.secondary,
+                        '& .MuiListItemText-primary': { fontSize: '0.7rem' },
+                        '& .MuiListItemText-secondary': { fontSize: '0.65rem' }
+                      }}
+                    />
+                  )}
                 </ListItem>
               ))}
             </List>
@@ -96,7 +126,7 @@ const Message = ({ message, isUser }) => {
         <Avatar sx={{ 
           width: 32, 
           height: 32,
-          bgcolor: '#e2cf9d',
+          bgcolor: mongoColors.accent.mist,
           mt: 1
         }}>
           <AccountCircleIcon sx={{ color: mongoColors.darkGreen }} />
@@ -199,16 +229,17 @@ export default function Chatbot() {
           position: 'fixed',
           bottom: 20,
           right: 20,
-          bgcolor: '#e2cf9d',
+          bgcolor: mongoColors.green,
           '&:hover': {
             bgcolor: mongoColors.forestGreen
           },
           width: 56,
           height: 56,
-          p: 0
+          p: 0,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
         }}
       >
-        {isOpen ? <CloseIcon /> : (
+        {isOpen ? <CloseIcon sx={{ color: mongoColors.darkGreen }} /> : (
           <Box
             component="img"
             src="/avatar-chunk.png"
@@ -234,31 +265,33 @@ export default function Chatbot() {
             height: isExpanded ? '80vh' : 500,
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: '#c7b482',
+            bgcolor: mongoColors.background.light,
             borderRadius: 2,
             overflow: 'hidden',
             border: `1px solid ${mongoColors.ui.border}`,
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
           }}
         >
           {/* Chat header */}
           <Box
             sx={{
               p: 2,
-              bgcolor: '#804f1e',
+              bgcolor: mongoColors.darkGreen,
               color: mongoColors.text.primary,
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              borderBottom: `1px solid ${mongoColors.ui.border}`
             }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>RAG Assistant</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: mongoColors.green }}>RAG Assistant</Typography>
             <Box>
               <Tooltip title={showSources ? "Hide Sources" : "Show Sources"}>
                 <IconButton 
                   size="small" 
                   onClick={() => setShowSources(!showSources)}
-                  sx={{ color: '#804f1e' }}
+                  sx={{ color: mongoColors.text.primary }}
                 >
                   {showSources ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
@@ -290,7 +323,7 @@ export default function Chatbot() {
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              bgcolor: '#f4e2bb'
+              bgcolor: mongoColors.background.light
             }}
           >
             {messages.map((message, index) => (
@@ -315,7 +348,7 @@ export default function Chatbot() {
               borderTop: `1px solid ${mongoColors.ui.border}`,
               display: 'flex',
               alignItems: 'center',
-              bgcolor: '#686227'
+              bgcolor: mongoColors.background.light
             }}
           >
             <TextField

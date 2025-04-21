@@ -44,6 +44,16 @@ async function processPdfFile(filePath, db) {
     console.log(`Extracting text from ${fileName}...`);
     const text = await extractTextFromPdf(filePath);
     
+    // Extract URL info from PDF name (MongoDB docs structure is 'Title _ MongoDB.pdf')
+    let url = null;
+    if (fileName.includes(' _ MongoDB.pdf')) {
+      // This is likely a MongoDB documentation PDF
+      const title = fileName.split(' _ MongoDB.pdf')[0];
+      // Create a URL-friendly slug from the title
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      url = `https://www.mongodb.com/docs/${slug}`;
+    }
+    
     // Check if the document exists and update or insert accordingly
     const result = await db.collection(CHATBOT_COLLECTIONS.documents).updateOne(
       { name: fileName },
@@ -52,6 +62,7 @@ async function processPdfFile(filePath, db) {
           path: filePath,
           content: text,
           type: 'pdf',
+          url: url, // Add the URL
           updatedAt: new Date()
         },
         $setOnInsert: {

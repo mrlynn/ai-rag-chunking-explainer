@@ -177,7 +177,8 @@ async function processQuery(query, db) {
         const document = await getDocumentInfo(chunk.chunkId, db);
         return {
           ...chunk,
-          documentName: document ? document.name : 'Unknown'
+          documentName: document ? document.name : 'Unknown',
+          documentUrl: document ? document.url : null
         };
       })
     );
