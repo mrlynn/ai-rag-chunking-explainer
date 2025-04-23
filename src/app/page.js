@@ -10,7 +10,8 @@ import {
   Paper, 
   CircularProgress,
   IconButton,
-  Tooltip
+  Tooltip,
+  Button
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -21,6 +22,9 @@ import RetrievalTab from '../components/RetrievalTab';
 import GenerationTab from '../components/GenerationTab';
 import OnboardingWizard from '../components/OnboardingWizard';
 import HelpDialog from '../components/HelpDialog';
+import RAGOnboarding from '../components/RAGOnboarding';
+import RAGKnowledgeBase from '../components/RAGKnowledgeBase';
+import RAGTooltip from '../components/RAGTooltip';
 
 // New color palette based on the image
 const imageColors = {
@@ -58,6 +62,8 @@ export default function Home() {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [showWizard, setShowWizard] = useState(false);
   const [showDocs, setShowDocs] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -355,6 +361,35 @@ export default function Home() {
             >
               Explore how different chunking strategies affect the full RAG pipeline
             </Typography>
+            
+            {/* New Help Buttons */}
+            <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+              <Button
+                variant="contained"
+                startIcon={<HelpOutlineIcon />}
+                onClick={() => setShowOnboarding(true)}
+                sx={{
+                  bgcolor: imageColors.primary.main,
+                  
+                  '&:hover': { bgcolor: imageColors.primary.dark }
+                }}
+              >
+                Learn About RAG
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<BookIcon />}
+                onClick={() => setShowKnowledgeBase(true)}
+                sx={{
+                  bgcolor: imageColors.primary.main,
+
+                  borderColor: imageColors.primary.main,
+                  '&:hover': { borderColor: imageColors.primary.dark }
+                }}
+              >
+                Knowledge Base
+              </Button>
+            </Box>
           </Box>
         </Box>
 
@@ -367,13 +402,17 @@ export default function Home() {
             border: `1px solid ${imageColors.accent.brown}`
           }}
         >
-          {/* Dynamic Header Title */}
+          {/* Dynamic Header Title with Tooltip */}
           <Box sx={{ 
             mb: 4,
             p: 3,
             borderRadius: 2,
             border: `1px solid ${imageColors.accent.brown}`,
-            bgcolor: imageColors.background.main
+            bgcolor: imageColors.background.main,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1
           }}>
             <Typography 
               variant="h4" 
@@ -389,6 +428,15 @@ export default function Home() {
               {tabIndex === 2 && "Semantic Search & Retrieval"}
               {tabIndex === 3 && "Context-Aware Response Generation"}
             </Typography>
+            <RAGTooltip
+              title={tabIndex === 0 ? "Document Chunking" : 
+                     tabIndex === 1 ? "Vector Embeddings" :
+                     tabIndex === 2 ? "Semantic Search" : "Response Generation"}
+              content={tabIndex === 0 ? "Breaking down documents into smaller, meaningful pieces that can be easily searched and retrieved." :
+                      tabIndex === 1 ? "Converting text into numerical vectors that capture semantic meaning for efficient searching." :
+                      tabIndex === 2 ? "Finding the most relevant pieces of information using vector similarity." :
+                      "Using retrieved information to generate accurate, context-aware responses."}
+            />
           </Box>
 
           {/* Help buttons */}
@@ -550,6 +598,16 @@ export default function Home() {
         open={showDocs}
         onClose={handleCloseDocs}
         colors={imageColors}
+      />
+
+      {/* Educational Components */}
+      <RAGOnboarding
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+      />
+      <RAGKnowledgeBase
+        open={showKnowledgeBase}
+        onClose={() => setShowKnowledgeBase(false)}
       />
     </Box>
   );
