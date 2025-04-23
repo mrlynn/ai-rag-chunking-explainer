@@ -109,7 +109,7 @@ export default function TermsOfUse() {
             paragraph
             sx={{ color: pageColors.text.secondary }}
           >
-            This application is provided "as is" without any warranties, express or implied. We do not guarantee that the application will be error-free or uninterrupted.
+            This application is provided as is without any warranties, express or implied. We do not guarantee that the application will be error-free or uninterrupted.
           </Typography>
 
           <Typography
