@@ -448,7 +448,7 @@ const RAGLifecycleDemo = () => {
       chunkCount: newChunks.length,
       settings: { chunkSize, overlap }
     });
-  }, [inputText, chunkSize, overlap, processText, addDebugLog]);
+  }, [inputText, chunkSize, overlap, processText]);
   
   // Generate "embeddings" for each chunk
   useEffect(() => {
@@ -461,7 +461,7 @@ const RAGLifecycleDemo = () => {
       metadata: chunk.metadata
     }));
     setVectorDocuments(newVectorDocs);
-  }, [chunkedText, generateEmbedding, chunkColors]);
+  }, [chunkedText]);
   
   // Options for the delimiter method
   const renderChunkingOptions = () => {

@@ -61,7 +61,7 @@ export default function TermsOfUse() {
             paragraph
             sx={{ color: pageColors.text.secondary }}
           >
-            By accessing and using this application, you accept and agree to be bound by these Terms of Use. This application is a demonstration tool for MongoDB Vector Search and RAG (Retrieval-Augmented Generation) technologies.
+            By using our service, you agree to these terms and conditions. If you do not agree, please do not use the service. These terms constitute a legally binding agreement between you and our company regarding your use of the service. We reserve the right to modify these terms at any time, and your continued use of the service after any such changes constitutes your acceptance of the new terms.
           </Typography>
 
           <Typography

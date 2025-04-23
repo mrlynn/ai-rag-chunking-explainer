@@ -89,7 +89,7 @@ const steps = [
               <CardContent>
                 <Typography variant="h6" sx={{ color: pageColors.text.primary }}>Accuracy</Typography>
                 <Typography sx={{ color: pageColors.text.secondary }}>
-                  RAG provides more accurate responses by grounding them in your actual data rather than relying solely on the model's training data.
+                  RAG provides more accurate responses by grounding them in your actual data rather than relying solely on the model&apos;s training data.
                 </Typography>
               </CardContent>
             </Card>
