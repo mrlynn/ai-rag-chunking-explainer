@@ -159,13 +159,13 @@ export default function TermsOfUse() {
           >
             For any questions regarding these terms, please contact us at{' '}
             <a
-              href="mailto:contact@mlynn.org"
+              href="mailto:merlynn@gmail.com"
               style={{
                 color: pageColors.text.primary,
                 textDecoration: 'none',
               }}
             >
-              contact@mlynn.org
+              merlynn@gmail.com
             </a>
           </Typography>
         </Paper>
